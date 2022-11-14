@@ -13,12 +13,13 @@ async function searchProductByName(name){
 
 async function getAllCategories(){
   let res = await axios("https://base-challenge.herokuapp.com/api/v1/category")
-  return console.log(res.data);
+  return categoriesList(res.data)
 }
 
 async function productsByCategory(id){
   let res = await axios(`https://base-challenge.herokuapp.com/api/v1/category/${id}`)
-  return console.log(res.data);
+  shop.innerHTML = ""
+  return showProducts(res.data)
 }
 
 
@@ -53,6 +54,7 @@ async function showProducts(products){
       </div>
     </div>
     `
+    //Nodo
     shop.append(show)
   })
 }
@@ -69,18 +71,26 @@ async function inputSearch(){
 }
 
 async function categoriesList(categories){
-  const categoriesContainer = document.getElementById("category")
+  const categoriesContainer = document.getElementById("categories")
   
   categories.map(categorie => {
-    let categoryElement = document.createElement("li")
-    categoryElement.className = "dropdown-item"
-    categoryElement.innerHTML =
+    let categoryItem = document.createElement('li');
+    categoryItem.className = 'dropdown-item';
+    categoryItem.innerHTML = 
     `
     <li>
-      <a class="dropdown-item" id='${categorie.id}'>${capitalize(categorie.name)}</a>
+    <a class='dropdown-item' id='${categorie.id}'>${capitalize(categorie.name)}</a>
     </li>
     `
-    categoriesContainer.append(categoryElement)
+    //Nodo
+    categoriesContainer.append(categoryItem)
+  })
+
+  const selectListItem = document.querySelectorAll('#categories li a')
+  selectListItem.forEach(item => {
+    item.addEventListener('click', (event) => {
+      if(event.target.id === item.id) productsByCategory(item.id)
+    })
   })
 }
 
@@ -88,7 +98,6 @@ async function categoriesList(categories){
 
 async function done(){
   let allProducts = await getAllProducts()
-  
   showProducts(allProducts)
   getAllCategories()
   inputSearch()
